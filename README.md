@@ -1,0 +1,10 @@
+# DataProcessing-Homework
+For educational purposes sharing practicals
+
+
+Student @ University of Amsterdam, following the minor programming.
+
+In this repo you will find the assignments that need to be submitted and are graded by the staff. 
+Have fun with the code!
+
+Ciao, miaow
