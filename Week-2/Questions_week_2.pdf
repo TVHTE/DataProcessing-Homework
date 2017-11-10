@@ -1,0 +1,10 @@
+// Questions:
+// 1) the === is used for strict equality. the difference is that == can be used for Null and None which are equal but are not strictly the same.
+// 2) A closure is a function having access to the parent scope, even after the parent function has closed.(https://www.w3schools.com/js/js_function_closures.asp)
+// 3) In mathematics and computer science, a higher-order function (also functional, functional form or functor) is a function that does at least one of the following:
+// takes one or more functions as arguments (i.e., procedural parameters),
+// returns a function as its result.[disputed – discuss]
+// (https://en.wikipedia.org/wiki/Higher-order_function)
+// 4) The querySelector() method returns the first element that matches a specified CSS selector(s) in the document.(https://www.w3schools.com/jsref/met_document_queryselector.asp)
+// example  Get the first <p> element in the document:
+// document.querySelector("p");
