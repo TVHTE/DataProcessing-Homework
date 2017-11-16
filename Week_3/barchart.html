@@ -38,8 +38,8 @@
       // var x = d3.scaleLinear()
       //     .range([0, width]);
 
-      var x = d3.scale.ordinal()
-          .rangeRoundBands([0, width], .1);
+      // var x = d3.scale.ordinal()
+      //     .rangeRoundBands([0, width], .1);
 
       // var x = d3.scaleBand()
       //   .domain(d3.range(0, width))
@@ -55,7 +55,6 @@
 
       d3.json("/json_data_1.json", function(error, data) {
         // x.domain(data.map(function(d) { return d.name; }));
-        x.domain(data.map(function(d) { return d.date; }));
         y.domain([0, d3.max(data, function(d) { return d.neer; })]);
 
         console.log(data)
@@ -63,24 +62,25 @@
         // var barWidth = width / data.length;
 
         // chart.attr("height", barHeight * data.length);
-        // var barWidth = width / data.length;
+        var barWidth = width / data.length;
 
         var bar = chart.selectAll("g")
           .data(data)
           .enter().append("g")
-          .attr("transform", function(d) { return "translate(" + x(d.date) + ",0)"; });
+          .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+
 
 
         bar.append("rect")
-          .attr("y", function(d) { return y(d.neer); })
-          .attr("height", function(d) { return height - y(d.neer); })
-          .attr("width", x.rangeBand());
+            .attr("y", function(d) { return y(d.neer); })
+            .attr("height", function(d) { return height - y(d.neer); })
+            .attr("width", barWidth - 1);
 
         bar.append("text")
-          .attr("x", x.rangeBand() / 2)
-          .attr("y", function(d) { return y(d.neer) + 3; })
-          .attr("dy", ".75em")
-          .text(function(d) { return d.neer; });
+            .attr("x", barWidth / 2)
+            .attr("y", function(d) { return y(d.neer) + 3; })
+            .attr("dy", ".75em")
+            .text(function(d) { return d.neer; });
       });
 
       function type(d) {
