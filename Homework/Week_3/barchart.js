@@ -44,7 +44,7 @@ var chart = d3.select(".chart")
   chart.call(tip);
 
 // load data
-d3.json("/json_data_1.json", function(error, data) {
+d3.json("json_data_1.json", function(error, data) {
   x.domain(data.map(function(d) { return d.date; }));
   y.domain([0, d3.max(data, function(d) { return d.neer; })]);
 
