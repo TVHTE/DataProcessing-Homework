@@ -27,10 +27,10 @@ def reformat_txt(raw_data):
             if line[0] != header:
                 tmp_data.append(line.strip().split(','))
 
-        data_dict = dict()
+        list_dict = []
 
         for line in tmp_data:
-            list_dict.append({'date':int(line[ITEM_1]),'neer':int(line[ITEM_2].strip())})
+            list_dict.append({'date':int(line[ITEM_1]),'neer':abs(int(line[ITEM_2].strip()))})
 
         json_data = json.dumps(list_dict)
         j = json.loads(json_data)
