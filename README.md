@@ -1,4 +1,7 @@
 # DataProcessing-Homework
+Toon van Holthe tot Echten
+10798595
+
 For educational purposes sharing practicals
 
 
@@ -8,3 +11,5 @@ In this repo you will find the assignments that need to be submitted and are gra
 Have fun with the code!
 
 Ciao, miaow
+
+week 3: https://github.com/TVHTE/DataProcessing-Homework/tree/master/Week_3
