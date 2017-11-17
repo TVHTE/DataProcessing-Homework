@@ -1,16 +1,25 @@
 How can D3 access and change the DOM? What do select and selectAll do?
--
-- selectAll() will simply select all the elements that match the criteria specified and return them as an array of elements. 
+- selectAll() will simply select all the elements that match the criteria specified and return them as an array of elements.
 
 What are the d and i in function(d){} and function(d, i){}?
 - d is the data and i is used to iterate
 
 Write sample lines of JavaScript to add a div element with class “barChart1” and to add an svg element with class “barChart2” with square dimensions
--
+- d3.select('body')append('div').class('barChart1')
+- d3.select('body'.append('svg').class('barChart2').attr('width',width).attr('height',width))
 
 
 Describe append, update, enter, and exit at a high level. What does “selectAll + data + enter + append” refer to?
 
+append: create new element between brackets (list)
+update: update elements when the data is also updated
+enter: prepares items from data items
+exit: deletes some elements from the selected data
+
 What are the main differences between drawing a bar chart with HTML and SVG?
 
+svg is vector based and html is pixel based also svg can make more complicated graphical elements
+
 In drawing the simple bar chart with D3 and SVG, what elements were appended, and what parts of the graph did these elements correspond to?
+
+<svg> all bars <g> to seperate bars <rect> seperate bars <text> seperate bars and axes
