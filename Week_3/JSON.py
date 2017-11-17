@@ -11,7 +11,7 @@ import csv
 
 # define headers raw data
 header = '#'
-raw_data = open("KNMI_20111101_NEERSLAG.txt", 'r')
+raw_data = open("KNMI_20101201_NEERSLAG.txt", 'r')
 ITEM_1 = 1
 ITEM_2 = 2
 
@@ -27,20 +27,10 @@ def reformat_txt(raw_data):
             if line[0] != header:
                 tmp_data.append(line.strip().split(','))
 
-        list_dict = []
         data_dict = dict()
-        list_date = []
-        list_temp = []
 
         for line in tmp_data:
             list_dict.append({'date':int(line[ITEM_1]),'neer':int(line[ITEM_2].strip())})
-            list_date.append(line[ITEM_1])
-            list_temp.append(line[ITEM_2].strip())
-
-        data_dict['date'] = list_date
-        data_dict['temp'] = list_temp
-
-        print(list_dict)
 
         json_data = json.dumps(list_dict)
         j = json.loads(json_data)
