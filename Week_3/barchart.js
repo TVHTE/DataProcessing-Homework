@@ -1,7 +1,6 @@
 // # Toon van Holthe tot Echten
 // # 10798595
 
-
 // Source: http://bl.ocks.org/d3noob/8952219
 // create canvas
 var margin = {top: 50, right: 30, bottom: 80, left: 40},
