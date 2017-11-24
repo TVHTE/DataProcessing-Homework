@@ -35,13 +35,6 @@ window.onload = function(){
   d3.json("DATA.json", function(error, data) {
     if (error) throw error;
 
-    data.forEach(function(d) {
-      d.CO2_emi = +d.CO2_emi;
-      d.cereal = +d.cereal;
-      d.agri = +d.agri;
-    });
-
-
     x.domain(d3.extent(data, function(d) { return d.CO2_emi; })).nice();
     y.domain(d3.extent(data, function(d) { return d.cereal; })).nice();
     t.domain(d3.extent(data, function(d) { return d.agri; })).nice();
@@ -125,7 +118,7 @@ window.onload = function(){
               y: function() { return y(d.cereal) - 15; }
           })
           .text(function() {
-            return ['CO2: '+ Math.round(d.CO2_emi), 'Cereal yield: '+ Math.round(d.cereal)];  // Value of the text
+            return ['CO2: '+ Math.round(d.CO2_emi), 'Cereal yield: '+ Math.round(d.cereal), d.Country];  // Value of the text
           });
         }
 
