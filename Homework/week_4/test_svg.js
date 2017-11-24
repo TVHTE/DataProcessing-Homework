@@ -50,7 +50,7 @@ d3.xml("test.svg", "image/svg+xml", function(error, xml) {
                                       .attr('x', X_BOX)
                                       .attr('y', (function(d, i) {return 10 + i * SPACE;}))
                                       .style("fill", (function(d, i) {return dict.classes[i].color;}))
-                                      .style('stroke','000000');
+                                      
 
     // add numbers from dict in same color as the rects
     d3.select('#Laag_1').selectAll('.st2').data(dict.classes)

@@ -11,7 +11,7 @@ import csv
 
 # define headers raw data
 header = '#'
-raw_data = open("KNMI_20101201_NEERSLAG.txt", 'r')
+raw_data = open("CO2", 'r')
 ITEM_1 = 1
 ITEM_2 = 2
 
@@ -35,7 +35,7 @@ def reformat_txt(raw_data):
         json_data = json.dumps(list_dict)
         j = json.loads(json_data)
 
-        with open('json_data_1.json', 'w') as outfile:
+        with open('CO2.json', 'w') as outfile:
             json.dump(j, outfile)
 
         with open('csv_data_2.csv', 'w') as out_file:
