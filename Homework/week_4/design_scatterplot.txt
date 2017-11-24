@@ -1,0 +1,4 @@
+During this assignment, a scatterplot was created.
+In order to visualize the connection between agricultural influences and the CO2 emission, the cereal yield per country was taken.
+The plot is visualized using the d3 tool for javascript. when moving over a dot the specific information is given.
+The colours used are nice and duidelijk.
