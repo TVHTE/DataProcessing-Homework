@@ -39,6 +39,7 @@ d3.json("DATA.json", function(error, data) {
     d.CO2_emi = +d.CO2_emi;
     d.cereal = +d.cereal;
     d.agri = +d.agri;
+    d.Country = +d.Country
   });
 
   x.domain(d3.extent(data, function(d) { return d.CO2_emi; })).nice();
@@ -54,7 +55,7 @@ d3.json("DATA.json", function(error, data) {
       .attr("x", width)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("CO2 emission");
+      .text("CO2 emission (metric tons per capita)");
 
   svg.append("g")
       .attr("class", "y axis")
@@ -65,7 +66,7 @@ d3.json("DATA.json", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("cereal yield")
+      .text("cereal yield (kg per hectare)")
 
   // title
   svg.append("text")
@@ -75,6 +76,13 @@ d3.json("DATA.json", function(error, data) {
       .style("font-size", "16px")
       .style("text-decoration", "underline")
       .text("CO2 emission versus cereal yield per country");
+
+  svg.append("text")
+      .attr("x", (width / 2))
+      .attr("y", 0 - (margin.top - 40))
+      .attr("text-anchor", "middle")
+      .style("font-size", "12px")
+      .text("Size indicates Agricultural land (% of land area)");
 
   svg.selectAll(".dot")
       .data(data)
@@ -117,7 +125,7 @@ d3.json("DATA.json", function(error, data) {
             y: function() { return y(d.cereal) - 15; }
         })
         .text(function() {
-          return [d.CO2_emi, d.cereal];  // Value of the text
+          return ['CO2: '+ Math.round(d.CO2_emi), 'Cereal yield: '+ Math.round(d.cereal), console.log(d.Country)];  // Value of the text
         });
       }
 
