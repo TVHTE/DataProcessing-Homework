@@ -1,0 +1,4 @@
+week_5 data processing
+
+for this weeks assignment a interactive line chart was made.
+Three vairables were chosen for two cities. when moving over the map, the values for each coordinate are shown aswell.
