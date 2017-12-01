@@ -5,9 +5,6 @@ window.onload = function(){
       var result = [];
       json.forEach(function(val,idx,arr){
 
-          // console.log(value)
-          // console.log(val[key])
-
         if(val[key] == value){
 
           result.push(val)
@@ -41,6 +38,7 @@ window.onload = function(){
         .append("g")
             .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
+
     var data;
     // Get the data
     d3.json("DATA_w5.json", function(error, json) {
@@ -99,8 +97,6 @@ function updateGraph(data) {
     	  // matching the data with selector status
     	})
 
-    console.log(result)
-
     var stad = svg.selectAll(".line")
         .data(result, function(d){return d.key});
 
@@ -123,9 +119,9 @@ function updateGraph(data) {
         .attr("x", (width / 2))
         .attr("y", 0 - (margin.top - 20))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "12px")
         .style("text-decoration", "underline")
-        .text("Line graph showing max temp, min temp and highest avg wind speed in Schiphol (380) and Maastricht (240)");
+        .text("Line graph showing max temp(TX), min temp(T10N) and highest avg wind speed(FHX) in Schiphol(380) and Maastricht(240)");
 
     svg.append("text")
         .attr("x", (width / 2))
@@ -188,7 +184,7 @@ function updateGraph(data) {
 
 	legend.transition()
       .style("fill", "#777" )
-      .text(function(d){return d.key;});
+      .text(function(d){return d.key + ' click me!';})
 
 	legend.exit().remove();
 
@@ -213,88 +209,102 @@ function updateGraph(data) {
           .attr("x", 0 - (height / 2))
           .attr("dy", "1em")
           .style("text-anchor", "middle")
-          .text('classes')
+          .text(function(d, i){return result[i].values[0]['TYPE']})
           .attr("class", "y axis label");
 
+      // mouse over event
+      // https://bl.ocks.org/larsenmtl/e3b8b7c2ca4787f77d78f58d41c3da91
 
-          // mouse event:
+      var mouseG = svg.append("g")
+            .attr("class", "mouse-over-effects");
 
+          mouseG.append("path") // this is the black vertical line to follow mouse
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
 
-    //       var focus = svg.append("g")
-    //           .attr("class", "focus")
-    //           .style("display", "none");
-    //
-    // //       focus.append("circle")
-    // //           .attr("transform", "translate(" + margin.left  + "," + margin.top + ")")
-    // //           .attr("x", 4)
-    // //           .attr("y", -1)
-    // //           .attr("r", 2);
-    //
-    // //       focus.append("text")
-    // //       		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    // //           .attr("x", 9)
-    // //           .attr("dy", ".35em");
-    //
-    //   for(var i=0;i<data.length;i++){
-    //               focus.append("g")
-    //                 .attr("class", "focus"+i)
-    //                 .append("circle")
-    //               	.style("stroke",  z(data[i].STN))
-    //               	.style("fill", z(data[i].STN))
-    //               	.attr("transform", "translate(" + margin.left  + "," + margin.top + ")")
-    //                 .attr("r", 2);
-    //               svg.select(".focus"+i)
-    //                 .append("text")
-    //               	.attr("transform", "translate(" + margin.left  + "," + margin.top + ")")
-    //                 .attr("x", 9)
-    //                 .attr("dy", ".35em");
-    //           }
-    //
-    //       svg.append("rect")
-    //           .attr("class", "overlay")
-    //           .attr("width", width)
-    //           .attr("height", height)
-    //       		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    //           .on("mouseover", function() { focus.style("display", null); })
-    //           .on("mouseout", function() { focus.style("display", "none"); })
-    //           .on("mousemove",  mousemove);
-    //
-    // //       function mousemove(c, j) {
-    // //         console.log(c,j);
-    // //         var coordinates = d3.mouse(this),
-    // //         		x0 = x.invert(coordinates[0]),
-    // //             y0 = y.invert(coordinates[1]),
-    // //             i = bisect(c.values, x0),
-    // //             d0 = c.values[i - 1],
-    // //             d1 = c.values[i],
-    // //             d = x0 - d0.x > d1.x - x0 ? d1 : d0;
-    // // //             console.log(x0,y0,i);
-    // // //         		console.log(coordinates) ;
-    // //         console.log(d0,d1);
-    // //         focus.attr("transform", "translate(" + x(c.values[i].x) + "," + y(c.values[i].y) + ")");
-    // //         focus.select("text").text(c.values[i].y);
-    // //       }
-    //
-    //   function mousemove() {
-    //               var x0 = x.invert(d3.mouse(this)[0]);
-    //               var series = data.map(function(e) {
-    //                     var i = bisect(e.values, x0, 1),
-    //                         d0 = e.values[i - 1],
-    //                         d1 = e.values[i];
-    //                     return x0 - d0.x > d1.x - x0 ? d1 : d0;
-    //                   });
-    // //     console.log(series);
-    //               for(var i=0; i<series.length;i++){
-    //                 var selectedFocus = svg.selectAll(".focus"+i);
-    //                 selectedFocus.attr("transform", "translate(" + x(parseTime(series[i].x)) + "," + y(series[i].y) + ")");
-    //                 selectedFocus.select("text").text(series[i].y);
-    //               }
-    //             }
-      };
+          var lines = document.getElementsByClassName('line');
 
+          var mousePerLine = mouseG.selectAll('.mouse-per-line')
+            .data(dataNest)
+            .enter()
+            .append("g")
+            .attr("class", "mouse-per-line");
 
+          mousePerLine.append("circle")
+            .attr("r", 7)
+            .style("stroke", function(d) {
+              return color(d.STN);
+            })
+            .style("fill", "none")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
 
+          mousePerLine.append("text")
+            .attr("transform", "translate(10,3)");
 
+          mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr('width', width) // can't catch mouse events on a g element
+            .attr('height', height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+              d3.select(".mouse-line")
+                .style("opacity", "0");
+              d3.selectAll(".mouse-per-line circle")
+                .style("opacity", "0");
+              d3.selectAll(".mouse-per-line text")
+                .style("opacity", "0");
+            })
+            .on('mouseover', function() { // on mouse in show line, circles and text
+              d3.select(".mouse-line")
+                .style("opacity", "1");
+              d3.selectAll(".mouse-per-line circle")
+                .style("opacity", "1");
+              d3.selectAll(".mouse-per-line text")
+                .style("opacity", "1");
+            })
+            .on('mousemove', function() { // mouse moving over canvas
+              var mouse = d3.mouse(this);
+              d3.select(".mouse-line")
+                .attr("d", function() {
+                  var d = "M" + mouse[0] + "," + height;
+                  d += " " + mouse[0] + "," + 0;
+                  return d;
+                });
+
+              d3.selectAll(".mouse-per-line")
+                .attr("transform", function(d, i) {
+                  var xDate = x.invert(mouse[0]),
+                      bisect = d3.bisector(function(d) { return d.DATE; }).right;
+                      idx = bisect(d.values, xDate);
+
+                  var beginning = 0,
+                      end = lines[i].getTotalLength(),
+                      target = null;
+
+                     console.log(lines[i])
+
+                  while (true){
+                    target = Math.floor((beginning + end) / 2);
+                    pos = lines[i].getPointAtLength(target);
+                    if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                        break;
+                    }
+                    if (pos.x > mouse[0])      end = target;
+                    else if (pos.x < mouse[0]) beginning = target;
+                    else break; //position found
+                  }
+
+                  d3.select(this).select('text')
+                    .text(y.invert(pos.y).toFixed(2));
+
+                  return "translate(" + mouse[0] + "," + pos.y +")";
+                });
+            });
+        }
+    }
 
     function clearAll(){
       d3.selectAll(".line")
@@ -320,4 +330,3 @@ function updateGraph(data) {
          }
        })
    };
-}
