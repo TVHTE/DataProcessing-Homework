@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+  <head>
+      <meta charset="utf-8">
+      <link rel="stylesheet" type="text/css" href="line_graph.css">
+      <body>
+      <script src="http://d3js.org/d3.v4.min.js"></script>
+      <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+      <select id="inds">
+          <option value="TX" selected="selected"> Max Temp </option>
+          <option value="FHX"> AVG Wind Speed </option>
+          <option value="T10N"> Min Temp </option>
+      </select>
+      <div id="legendContainer" class="legendContainer">
+      	<svg id="legend"></svg>
+      </div>
+      <div id="showAll">
+      	<input name="showAllButton"
+      	 type="button"
+      	 value="Show All"
+      	 onclick="showAll()" />
+      </div>
+      <div id="clearAll">
+      	<input name="clearAllButton"
+      	 type="button"
+      	 value="Clear All"
+      	 onclick="clearAll()" />
+      </div>
+      <script src='line_graph_2.js'></script>
+      </body>
+  </head>
