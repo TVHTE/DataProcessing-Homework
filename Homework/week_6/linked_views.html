@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.subunits :hover {
+  fill: red;
+}
+
+.sub-borders {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+#legendContainer{
+	position:absolute;
+	top:60px;
+	left:10px;
+	overflow: auto;
+	height:490px;
+	width:110px;
+}
+#legend{
+	width:90px;
+	height:200px;
+}
+.legend {
+    font-size: 12px;
+    font-weight: normal;
+    text-anchor: left;
+}
+.line {
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+</style>
+
+<body>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script>
+
+    function filterJSON(json, key, value) {
+      var result = [];
+      json.forEach(function(val,idx,arr){
+
+        if(val[key] == value){
+
+          result.push(val)
+        }
+      })
+      return result;
+    }
+
+    var margin = {top: 50, right: 80, bottom: 40, left: 160},
+        width = 1300 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
+
+    var colour = d3.scale.category20();
+
+    var projection = d3.geo.mercator()
+        .scale(1)
+        .translate([0, 0]);
+
+    var path = d3.geo.path()
+        .projection(projection);
+
+    var svg = d3.select("body")
+        .append("svg")
+            .attr('class', 'map')
+            .attr("width", width)
+            .attr("height", height)
+        .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+    var line_svg = d3.select("body")
+        .append("svg")
+          .attr('class', 'line_svg')
+          .attr("width", width)
+          .attr("height", height)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+    // Parse the date / time
+    var parseTime = d3.time.format("%Y%m%d").parse;
+
+    // Set the ranges
+    var x = d3.time.scale().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+
+    // Define the line
+    var line = d3.svg.line()
+        .x(function(d) { return x(d.DATE); })
+        .y(function(d) { return y(d.VALUE); });
+
+    // load in both datasets
+    queue()
+        .defer(d3.json, 'DATA_w6_2.json')
+        .defer(d3.json, 'NL_provincies.json')
+        .await(function(error, json, nl) {
+          if (error) throw error;
+
+          json.forEach(function(d) {
+              d.DATE = parseTime(d.DATE.toString());
+              d.VALUE = +d.VALUE
+              d.active = true;
+          });
+
+            var l = topojson.feature(nl, nl.objects.subunits).features[3],
+                b = path.bounds(l),
+                s = .2 / Math.max((b[1][0] - b[0][0]) / width , (b[1][1] - b[0][1]) / height),
+                t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+            projection
+                .scale(s)
+                .translate(t);
+
+            // create and append the map
+            var map = d3.select('#map').selectAll('path')
+                .data(nl.features)
+                .enter()
+                .append('path')
+                .attr('d', path)
+                .style('fill', '#eee')
+                .style('stroke', 'black')
+                .style('stroke-width', 1);
+
+            // add the province name as its class
+            map.attr('class', function(d) {
+                            return nl.properties.name;
+                         });
+
+            svg.selectAll("path")
+                .data(topojson.feature(nl, nl.objects.subunits).features).enter()
+                .append("path")
+                .attr("d", path)
+                .attr("fill", function(d, i) {
+                    return colour(i);
+                })
+                .attr("class", function(d, i) {
+                    return d.properties.name;
+                });
+
+            svg.append("g")
+                .attr("class", "subunits")
+                .selectAll("path")
+                .data(topojson.feature(nl, nl.objects.subunits).features)
+                .enter().append("path")
+                .attr("d", path);
+
+            // enabling change of color to red
+            let hoverEnabled = false;
+                svg.on('mousedown', x => hoverEnabled = true)
+                    .on('mouseup', x => hoverEnabled = false)
+                svg.selectAll('.subunits path').on('mouseover', function(d) {
+                    if (hoverEnabled) {
+                        this.classList.add('hovered');
+                    }
+                });
+
+            svg.append("path")
+                .attr("class", "sub-borders")
+                .attr("d", path(topojson.mesh(nl, nl.objects.subunits, function(a, b) { return a !== b; })));
+
+            svg.selectAll('.subunits path').on('mouseover', function(d) {
+                section = d.properties.name
+
+                knmi_data = filterJSON(json, 'STN', section);
+
+                knmi_data.forEach(function(d) {
+        			d.VALUE = +d.VALUE
+        			d.active = true;
+        		});
+
+                //debugger
+				updateGraph(knmi_data);
+
+				jQuery('h1.page-header').html(section);
+    			});
+
+            // generate initial graph
+        	knmi_data = filterJSON(json, 'STN', 'Limburg');
+
+            updateGraph(knmi_data)
+
+        });
+
+function updateGraph(data) {
+
+    // Scale the range of the data
+    x.domain(d3.extent(data, function(d) { return d.DATE; }));
+    y.domain([d3.min(data, function(d) { return d.VALUE; }), d3.max(data, function(d) { return d.VALUE; })]);
+    console.log([d3.min(data, function(d) { return d.VALUE; }), d3.max(data, function(d) { return d.VALUE; })])
+
+    // Define the axes
+    var xAxis = d3.svg.axis().scale(x)
+        .orient("bottom").ticks(5);
+
+    var yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(5);
+
+    // Nest the entries by stad
+    dataNest = d3.nest()
+        .key(function(d) {return d.STN;})
+        .entries(data);
+
+    console.log(dataNest)
+
+    var result = dataNest.filter(function(val,idx, arr){
+    	  return $("." + val.key).attr("fill") != "#ccc"
+    	  // matching the data with selector status
+    	})
+
+    var stad = line_svg.selectAll(".line")
+        .data(result, function(d){return d.key});
+
+    stad.enter().append("path")
+        .attr("class", "line")
+        .text(result, function(d){return d.TYPE});
+
+    stad.transition()
+    	// .style("stroke", function(d,i) { return d.color = color(d.key); })
+    	.attr("id", function(d){ return 'tag'+d.key.replace(/\s+/g, '');}) // assign ID
+    	.attr("d", function(d){
+
+    		return line(d.values)
+    	});
+
+    stad.exit().remove();
+
+    var legend = d3.select("#legend")
+    	.selectAll("text")
+    	.data(dataNest, function(d){return d.key});
+
+    //checkboxes
+    legend.enter().append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", 0)
+        .attr("y", function (d, i) { return 0 +i*15; })  // spacing
+        .attr("fill",function(d) {
+            return color(d.key);
+        })
+
+        .attr("class", function(d,i){return "legendcheckbox " + d.key})
+    	.on("click", function(d){
+    	  d.active = !d.active;
+
+    d3.select(this).attr("fill", function(d){
+        if(d3.select(this).attr("fill")  == "#ccc"){
+            return color(d.key);
+        }
+        else {
+            return "#ccc";
+        }
+    });
+
+
+    var result = dataNest.filter(function(val,idx, arr){
+        return $("." + val.key).attr("fill") != "#ccc"
+        // matching the data with selector status
+    });
+
+    // Hide or show the lines based on the ID
+    svg.selectAll(".line").data(result, function(d){return d.key})
+        .enter()
+        .append("path")
+        .attr("class", "line")
+        .style("stroke", function(d,i) { return d.color = color(d.key); })
+        .attr("d", function(d){
+            return line(d.values);
+        });
+
+    svg.selectAll(".line").data(result, function(d){return d.key}).exit().remove()
+
+    });
+
+    // Add the Legend text
+    legend.enter().append("text")
+        .attr("x", 15)
+        .attr("y", function(d,i){return 10 +i*15;})
+        .attr("class", "legend");
+
+    legend.transition()
+        .style("fill", "#777" )
+        .text(function(d){return d.key + ' click me!';})
+
+    legend.exit().remove();
+
+    line_svg.selectAll(".axis").remove();
+
+    line_svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+      var yaxis = line_svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+
+    // Add a label to the y axis
+    line_svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0 - 60)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(function(d, i){return result[i].values[0]['TYPE']})
+        .attr("class", "y axis label");
+
+    };
+
+    // title
+    line_svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top - 20))
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .style("text-decoration", "underline")
+        .text("Line graph showing max temp(TX) for each province");
+
+    line_svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top - 600))
+        .attr("text-anchor", "middle")
+        .style("font-size", "12px")
+        .text("Toon van Holthe tot Echten");
+
+    </script>
+</body>
+</html>
