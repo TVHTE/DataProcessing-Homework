@@ -1,74 +1,4 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-
-    .subunits :hover {
-        fill: red;
-    }
-
-    .sub-borders {
-        fill: none;
-        stroke: #fff;
-        stroke-width: 0.5px;
-        stroke-linejoin: round;
-        stroke-linecap: round;
-        pointer-events: none;
-    }
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: grey;
-        stroke-width: 1;
-        shape-rendering: crispEdges;
-    }
-    .line {
-        stroke: steelblue;
-        stroke-width: 2;
-        fill: none;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    .d3-tip {
-        line-height: 1;
-        font-weight: bold;
-        padding: 12px;
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        border-radius: 2px;
-    }
-
-/* Creates a small triangle extender for the tooltip */
-    .d3-tip:after {
-        box-sizing: border-box;
-        display: inline;
-        font-size: 10px;
-        width: 100%;
-        line-height: 1;
-        color: rgba(0, 0, 0, 0.8);
-        content: "\25BC";
-        position: absolute;
-        text-align: center;
-    }
-
-    /* Style northward tooltips differently */
-    .d3-tip.n:after {
-        margin: -1px 0 0 0;
-        top: 100%;
-        left: 0;
-    }
-</style>
-
-<body>
-    <script src="https://d3js.org/d3.v3.min.js"></script>
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
-    <script src="https://d3js.org/topojson.v1.min.js"></script>
-    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
-    <script src="https://d3js.org/queue.v1.min.js"></script>
-    <script>
+window.onload = function(){
 
     function filterJSON(json, key, value) {
       var result = [];
@@ -94,6 +24,10 @@
 
     // colour for map
     var colour = d3.scale.category20();
+
+    var colour = d3.scale.linear()
+					.range(["#000099", "#0033cc"])
+					.domain([200, 0]);
 
     var projection = d3.geo.mercator()
         .scale(1)
@@ -155,7 +89,7 @@
         .defer(d3.json, 'DATA_w6_2.json')
         .defer(d3.json, 'NL_provincies.json')
         .await(function(error, json, nl) {
-          if (error) throw error;
+          if (error) throw window.alert("Failed loading data");
 
           json.forEach(function(d) {
               d.DATE = parseTime(d.DATE.toString());
@@ -176,11 +110,12 @@
                 .attr("class", "subunits")
                 .selectAll("path")
                 .data(topojson.feature(nl, nl.objects.subunits).features)
+                // .data(json)
                 .enter()
                 .append("path")
                 .attr("d", path)
                 .attr("fill", function(d, i) {
-                    return colour(i);
+                    return colour(i * 50);
                 })
                 .attr("class", function(d, i) {
                     return d.properties.name;
@@ -208,24 +143,24 @@
                 knmi_data = filterJSON(json, 'STN', section);
 
                 knmi_data.forEach(function(d) {
-        			d.VALUE = +d.VALUE
-        			d.active = true;
-        		});
+                    d.VALUE = +d.VALUE
+                    d.active = true;
+                });
 
                 //debugger
-				updateGraph(knmi_data);
+                updateGraph(knmi_data);
 
-				jQuery('h1.page-header').html(section);
-    			});
+                jQuery('h1.page-header').html(section);
+                });
 
             // generate initial graph
-        	knmi_data = filterJSON(json, 'STN', 'Limburg');
+            knmi_data = filterJSON(json, 'STN', 'Limburg');
 
             updateGraph(knmi_data)
 
         });
 
-function updateGraph(data) {
+    function updateGraph(data) {
 
     var color = d3.scale.ordinal().range(["steelblue"]);
 
@@ -241,9 +176,9 @@ function updateGraph(data) {
         .entries(data);
 
     var result = dataNest.filter(function(val,idx, arr){
-    	  return $("." + val.key).attr("fill") != "#ccc"
-    	  // matching the data with selector status
-    	})
+          return $("." + val.key).attr("fill") != "#ccc"
+          // matching the data with selector status
+        })
 
     var stad = line_svg.selectAll(".line")
         .data(result, function(d){return d.key});
@@ -253,12 +188,12 @@ function updateGraph(data) {
         .text(result, function(d){return d.TYPE});
 
     stad.transition()
-    	.style("stroke", function(d,i) { return d.color = color(d.key); })
-    	.attr("id", function(d){ return 'tag'+d.key.replace(/\s+/g, '');}) // assign ID
-    	.attr("d", function(d){
+        .style("stroke", function(d,i) { return d.color = color(d.key); })
+        .attr("id", function(d){ return 'tag'+d.key.replace(/\s+/g, '');}) // assign ID
+        .attr("d", function(d){
 
-    		return line(d.values)
-    	});
+            return line(d.values)
+        });
 
     stad.exit().remove();
 
@@ -363,6 +298,8 @@ function updateGraph(data) {
         }
 
     d3.select(this).select('text')
+        .style("fill", "red")
+        .style("font-size", "18px")
         .text(y.invert(pos.y).toFixed(2));
 
     return "translate(" + mouse[0] + "," + pos.y +")";
@@ -379,8 +316,6 @@ function updateGraph(data) {
         .style("text-decoration", "underline")
         .text("Line graph showing max temp(TX) for " + data[0]['STN']);
 
-};
-
     // name
     line_svg.append("text")
         .attr("x", (width / 2))
@@ -389,6 +324,5 @@ function updateGraph(data) {
         .style("font-size", "12px")
         .text("Toon van Holthe tot Echten");
 
-    </script>
-</body>
-</html>
+    };
+}

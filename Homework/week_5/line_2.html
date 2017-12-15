@@ -313,7 +313,7 @@ function updateGraph(data) {
             .style("stroke-width", "1px")
             .style("opacity", "0");
 
-          var lines = document.getElementsByClassName('line');
+          var lines = document.getElementsByClassName('stad');
 
           var mousePerLine = mouseG.selectAll('.mouse-per-line')
             .data(dataNest)
@@ -370,14 +370,13 @@ function updateGraph(data) {
                       idx = bisect(d.values, xDate);
 
                   var beginning = 0,
-                      end = lines[i].getTotalLength(),
+                      end = 100 //lines[i].getTotalLength(),
                       target = null;
 
-                     console.log(lines[i])
 
                   while (true){
                     target = Math.floor((beginning + end) / 2);
-                    pos = lines[i].getPointAtLength(target);
+                    pos = 100 //lines[i].getPointAtLength(target);
                     if ((target === end || target === beginning) && pos.x !== mouse[0]) {
                         break;
                     }
@@ -393,6 +392,8 @@ function updateGraph(data) {
                 });
             });
         }
+
+     console.log(end)
 
     function clearAll(){
       d3.selectAll(".line")
